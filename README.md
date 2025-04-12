@@ -1,52 +1,52 @@
-### 欢迎star~~
+### Welcome to star~~
+[中文版](./README.md)
 
-学习过程已记录到博客，欢迎交流：https://wenkil.github.io/tags/Langgraph/
+The learning process has been recorded on the blog, welcome to communicate: https://wenkil.github.io/tags/Langgraph/
 
-## 项目简介
+## Project Introduction
 
-这是一个记录个人学习过程的项目，是基于LangGraph框架的AI助手，能够执行网络搜索和网页内容抓取。该助手可以分析用户问题，判断是否需要从互联网获取信息，然后通过搜索引擎获取相关链接，爬取网页内容，并生成综合性回答。
+This is a project documenting a personal learning process, based on the LangGraph framework to create an AI assistant capable of performing web searches and web content scraping. The assistant can analyze user questions, determine whether information needs to be retrieved from the internet, then obtain relevant links through search engines, scrape webpage content, and generate comprehensive answers.
 
-项目通过"搜索→抓取→总结"的工作流，提供了比简单搜索更全面深入的信息获取能力。
+The project provides more comprehensive and in-depth information retrieval capabilities than simple searches through a "Search → Scrape → Summarize" workflow.
 
-## 核心功能
+## Core Features
 
-- **智能对话**：基础的聊天功能，理解用户问题
-- **网络搜索**：集成Tavily/DuckDuckGo等搜索API
-- **网页内容抓取**：使用Crawl4AI爬取和解析网页内容
-- **内容总结**：对爬取内容进行分析和综合，生成结构化回答
+- **Intelligent Conversation**: Basic chat functionality, understanding user questions
+- **Web Search**: Integration with Tavily/DuckDuckGo and other search APIs
+- **Web Content Scraping**: Using Crawl4AI to scrape and parse webpage content
+- **Content Summarization**: Analysis and synthesis of scraped content to generate structured answers
 
-## 工作流图示
+## Workflow Diagram
 
-![工作流示例](./web_crawl_graph-2025-04-12_22-35-50.png)
+![Workflow Example](./web_crawl_graph-2025-04-12_22-35-50.png)
 
+## Installation Guide
 
-## 安装指南
-
-### 环境要求
+### Requirements
 
 - Python 3.12
-- 支持Function Calling的大语言模型API
+- LLM API supporting Function Calling
 
-### 环境配置
+### Environment Setup
 
-使用conda创建环境:
+Create environment with conda:
 
 ```bash
-# 创建名为langgraph_study_web_agent的环境并安装Python 3.12
+# Create an environment named langgraph_study_web_agent with Python 3.12
 conda create -n langgraph_study_web_agent python=3.12 -y
-# 激活环境
+# Activate the environment
 conda activate langgraph_study_web_agent
 ```
 
-### 依赖安装
+### Dependencies Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 配置
+### Configuration
 
-创建`.env`文件并配置以下环境变量：
+Create a `.env` file and configure the following environment variables:
 
 ```
 TAVILY_API_KEY=your_tavily_api_key
@@ -54,36 +54,36 @@ SILICONFLOW_API_KEY=your_api_key
 SILICONFLOW_BASE_URL=your_base_url
 ```
 
-## 实现细节
+## Implementation Details
 
-### 1. 状态图设计
+### 1. State Graph Design
 
-项目使用LangGraph的状态图设计，包含以下节点：
+The project uses LangGraph's state graph design, containing the following nodes:
 
-- `chat_bot`：分析用户问题，决定是否需要使用搜索工具
-- `search_tool`：执行网络搜索，获取相关URL
-- `crawl4ai_tool`：抓取URL网页内容
-- `summary_bot`：分析抓取内容，生成最终回答
+- `chat_bot`: Analyzes user questions and decides whether search tools are needed
+- `search_tool`: Performs web searches to obtain relevant URLs
+- `crawl4ai_tool`: Scrapes webpage content from URLs
+- `summary_bot`: Analyzes scraped content and generates final answers
 
-### 2. 网页抓取工具
+### 2. Web Scraping Tool
 
-基于Crawl4AI库开发的网页抓取工具：
+Web scraping tool developed based on the Crawl4AI library:
 
 ```python
 async def quick_crawl_tool(urls: list[str]):
     """
-    爬取指定URL列表的网页内容，并保存到本地文件
+    Scrape webpage content from the specified URL list and save to local files
     
     Args:
-        urls: 要爬取的URL列表
+        urls: List of URLs to scrape
         
     Returns:
-        str: 所有爬取结果拼接的文本
+        str: Concatenated text of all scraping results
     """
     browser_config = BrowserConfig(
-        headless=True,  # 启用无头模式
-        user_agent_mode="random", # 随机生成user_agent
-        text_mode=True, # 只返回文本内容
+        headless=True,  # Enable headless mode
+        user_agent_mode="random", # Randomly generate user_agent
+        text_mode=True, # Return text content only
     )
     
     run_conf = CrawlerRunConfig(
@@ -96,61 +96,61 @@ async def quick_crawl_tool(urls: list[str]):
         exclude_external_images=True,
     )
     
-    # 爬取网页并返回内容
-    # 实现详见源码
+    # Scrape webpages and return content
+    # See source code for implementation details
 ```
 
-### 3. 搜索与爬取流程
+### 3. Search and Scraping Process
 
-通过条件路由，实现"问题分析→搜索→爬取→总结"的完整流程：
+A complete "Question Analysis → Search → Scrape → Summarize" workflow is implemented through conditional routing:
 
 ```python
-# 设置入口点
+# Set entry point
 graph_builder.set_entry_point("chat_bot")
 
-# 添加条件边
+# Add conditional edges
 graph_builder.add_conditional_edges(
     "chat_bot",
     route_search_tool,
     path_map={"search_tool": "search_tool", "END": END}
 )
 
-# 添加其他边
+# Add other edges
 graph_builder.add_edge("search_tool", "crawl4ai_tool")
 graph_builder.add_edge("crawl4ai_tool", "summary_bot")
 graph_builder.add_edge("summary_bot", END)
 ```
 
-## 使用示例
+## Usage Example
 
 ```python
-# 创建初始消息
+# Create initial message
 system_message = SystemMessage(content=f"""
-    # 你是一个强大的AI助手，擅长搜索和分析网络信息。
-    ## 对于用户的问题，请先分析是否有足够知识进行回答，否则就要进行网络查询。
-    ## 如果需要查询实时或专业信息，请先使用[搜索工具]获取相关内容的链接。
-    ## 如果[搜索工具]返回的是链接，需要再用[爬虫工具]获取具体内容。
-    ## 请牢记今天的日期是{today}。
+    # You are a powerful AI assistant, skilled at searching and analyzing information from the web.
+    ## For user questions, first analyze whether you have sufficient knowledge to answer, otherwise perform a web search.
+    ## If you need to query real-time or specialized information, first use the [search tool] to get links to relevant content.
+    ## If the [search tool] returns links, you need to use the [crawler tool] to get the specific content.
+    ## Please remember that today's date is {today}.
 """)
 
-first_message = HumanMessage(content="crawl4ai是什么？")
+first_message = HumanMessage(content="What is crawl4ai?")
 
-# 初始化状态
+# Initialize state
 initial_state = {"messages": [system_message, first_message]}
 
-# 执行图
+# Execute graph
 async for event in graph.astream_events(initial_state):
-    # 处理事件...
+    # Process events...
 ```
 
-## 注意事项
+## Notes
 
-1. 对于在线PDF文件(比如.pdf结尾)，当前版本的Crawl4AI无法直接爬取，系统会返回PDF的链接给用户自行查看。（官方issues已有人提，估计是后续会有相关功能）
-2. 使用DuckDuckGoSearchResults时，确保设置`output_format="list"`，并且链接字段为"link"。
-3. 数据隐私：爬取内容会临时保存在本地文件中。
+1. For online PDF files (ending with .pdf), the current version of Crawl4AI cannot scrape them directly. The system will return the PDF link for users to view on their own. (This has been raised in official issues and will likely be addressed in future updates)
+2. When using DuckDuckGoSearchResults, ensure `output_format="list"` is set, and the link field is "link".
+3. Data privacy: Scraped content is temporarily saved in local files.
 
-## 未来计划
+## Future Plans
 
-- 历史会话管理
-- 多工具协同支持
-- Web界面集成
+- History session management
+- Multi-tool collaboration support
+- Web interface integration 
