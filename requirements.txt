@@ -1,0 +1,9 @@
+langchain
+langchain-core
+langchain_community
+langchain_openai
+langgraph
+qianfan
+tavily-python
+duckduckgo-search
+crawl4ai
