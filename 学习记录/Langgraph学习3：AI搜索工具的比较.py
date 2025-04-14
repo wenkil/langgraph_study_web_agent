@@ -83,7 +83,7 @@ def search_with_tool(query, tool_type, max_results):
             search_tool = TavilySearchResults(max_results=max_results)
             tool_name = "Tavily"
         elif tool_type.lower() == "duckduckgo":
-            search_tool = DuckDuckGoSearchResults(max_results=max_results, output_format="list")
+            search_tool = DuckDuckGoSearchResults(num_results=max_results, output_format="list")
             tool_name = "DuckDuckGo"
         else:
             return {

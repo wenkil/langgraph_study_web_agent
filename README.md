@@ -145,7 +145,7 @@ async for event in graph.astream_events(initial_state):
 ## 注意事项
 
 1. 对于在线PDF文件(比如.pdf结尾)，当前版本的Crawl4AI无法直接爬取，系统会返回PDF的链接给用户自行查看。（官方issues已有人提，估计是后续会有相关功能）
-2. 使用DuckDuckGoSearchResults时，确保设置`output_format="list"`，并且链接字段为"link"。
+2. 使用DuckDuckGoSearchResults时，确保设置`output_format="list"`，并且链接字段为"link"。且最大次数字段是num_results，而不是max_results。
 3. 数据隐私：爬取内容会临时保存在本地文件中。
 
 ## 未来计划
