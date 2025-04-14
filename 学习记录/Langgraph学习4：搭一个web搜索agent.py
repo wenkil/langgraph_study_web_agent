@@ -24,7 +24,7 @@ os.environ['TAVILY_API_KEY'] = os.getenv('TAVILY_API_KEY', '')
 def search(query: str):
     """用于浏览网络进行搜索。"""
     # search_tool = TavilySearchResults(max_results=3)
-    search_tool = DuckDuckGoSearchResults(max_results=3, output_format="list") # output_format="list"
+    search_tool = DuckDuckGoSearchResults(num_results=3, output_format="list") # output_format="list"
     return search_tool.invoke(query)
 tools = [search]
 
